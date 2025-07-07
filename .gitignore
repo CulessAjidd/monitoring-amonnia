@@ -1,0 +1,41 @@
+# Python cache & metadata
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Flask config & secrets
+.env
+*.env
+
+# Flask DB (opsional)
+*.sqlite3
+*.db
+
+# Flask migrations (opsional reset)
+migrations/
+
+# Logs
+*.log
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Compiled HTML/JS (optional, if using Webpack)
+dist/
+build/
+node_modules/
