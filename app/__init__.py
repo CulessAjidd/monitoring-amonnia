@@ -5,7 +5,11 @@ from .routes.auth_routes import auth_bp
 from .routes.jadwal_routes import jadwal_bp
 from .routes.wilayah_routes import wilayah_bp
 from .routes.admin_routes import admin_bp
-from .extensions import db, migrate
+from .routes.masyarakat_routes import masyarakat_bp
+from .extensions import db, migrate, mail
+import logging
+from logging.handlers import RotatingFileHandler
+import os
 
 def create_app():
     app = Flask(__name__)
@@ -17,10 +21,28 @@ def create_app():
 
     db.init_app(app)
     migrate.init_app(app, db)
+    mail.init_app(app)
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(jadwal_bp)
     app.register_blueprint(wilayah_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(masyarakat_bp)
+
+
+    if not app.debug:
+        # Pastikan folder log ada
+        if not os.path.exists('logs'):
+            os.mkdir('logs')
+
+        # File log dengan rotating (maks 1MB, simpan 10 file)
+        file_handler = RotatingFileHandler('logs/app.log', maxBytes=1024 * 1024, backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s [%(levelname)s] %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+
+        app.logger.info("Flask app startup")
 
     return app
