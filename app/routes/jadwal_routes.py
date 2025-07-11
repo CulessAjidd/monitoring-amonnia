@@ -1,4 +1,7 @@
-from flask import Blueprint, render_template, redirect, request, url_for, session, jsonify
+from flask import Blueprint, render_template, flash, redirect, request, url_for, session, jsonify
+
+from app.forms import JadwalForm
+from app.models.kecamatan import Kecamatan
 from app.services.mail_service import send_email
 
 jadwal_bp = Blueprint('jadwal', __name__)
@@ -11,9 +14,23 @@ def lihat_jadwal():
     return render_template('jadwal/lihat-jadwal.html')
 
 
-@jadwal_bp.route('/jadwal/tambah', methods=['GET'])
+@jadwal_bp.route('/jadwal/tambah', methods=['GET', 'POST'])
 def tambah_jadwal():
 
+    form = JadwalForm()
+
+    days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumad', 'Sabtu', 'Minggu']
+    kecamatan = Kecamatan.query.filter_by(kabupaten_id=1).order_by(Kecamatan.name.asc()).all()
+
+    if form.validate_on_submit():
+        min_val = form.minimal.data
+        max_val = form.maximal.data
+        print(min_val, max_val)
+        print(f"Valid! Minimal: {min_val}, Maksimal: {max_val}", "success")
+    else:
+        print("Form tidak valid!")
+        print(form.errors)  # ← ini cetak semua error dalam bentuk dict
+        print("maximal.errors =", form.maximal.errors)
     # result = send_email(
     #     subject="Selamat Datang di Aplikasi Kami",
     #     recipients=["muhajidachmad@gmail.com"],
@@ -22,7 +39,10 @@ def tambah_jadwal():
     #     bcc=["ajid.developer@gmail.com"]
     # )
 
-    return jsonify({"status": "result"})
+    return render_template('jadwal/tambah-jadwal.html',
+                           days = days,
+                           kecamatan = kecamatan,
+                           form = form)
 
 
 

@@ -42,7 +42,8 @@
 
     <!-- Vendors CSS -->
 
-    <link rel="stylesheet" href="{{url_for('static', filename='vendor/libs/perfect-scrollbar/perfect-scrollbar.css')}}"/>
+    <link rel="stylesheet"
+          href="{{url_for('static', filename='vendor/libs/perfect-scrollbar/perfect-scrollbar.css')}}"/>
 
     <!-- endbuild -->
 
@@ -71,22 +72,16 @@
 <div class="authentication-wrapper authentication-cover">
     <!-- Logo -->
     <a href="index.html" class="auth-cover-brand d-flex align-items-center gap-2">
-        <span class="app-brand-text demo text-heading fw-semibold">Monitoring Amonnia</span>
+        <img src="{{url_for('static', filename='logo/logo.png')}}" width="180" alt="logo-login">
     </a>
     <!-- /Logo -->
     <div class="authentication-inner row m-0">
         <!-- /Left Text -->
         <div class="d-none d-lg-flex col-lg-7 col-xl-8 align-items-center justify-content-center p-12 pb-2">
             <img
-                    src="{{url_for('static', filename='logo/logo.png')}}"
+                    src="{{url_for('static', filename='logo/logo-login.png')}}"
                     class="auth-cover-illustration w-100"
                     alt="auth-illustration"/>
-            <img
-                    src="../../assets/img/illustrations/auth-cover-register-mask-light.png"
-                    class="authentication-image"
-                    alt="mask"
-                    data-app-light-img="illustrations/auth-cover-register-mask-light.png"
-                    data-app-dark-img="illustrations/auth-cover-register-mask-dark.png"/>
         </div>
         <!-- /Left Text -->
 
@@ -97,34 +92,36 @@
                 <h4 class="mb-1">Selamat Datang</h4>
                 <p class="mb-5">Silahkan login terlebih dahulu!</p>
 
-                <form id="formAuthentication" class="mb-5" action="index.html" method="GET">
-                    <div class="form-floating form-floating-outline mb-5 form-control-validation">
+                <form method="POST">
+                    {{ form.csrf_token }}
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    {% for msg in messages %}
+                    <div class="alert alert-danger" role="alert">{{ msg }}</div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                    <div class="mb-4">
+                        <label class="form-label" for="email">Email</label>
                         <input
-                                type="text"
+                                type="email"
+                                id="email"
+                                name="email"
                                 class="form-control"
-                                id="username"
-                                name="username"
-                                placeholder="Masukan username"
-                                autofocus/>
-                        <label for="username">Username</label>
+                                placeholder="Masukan email anda"/>
                     </div>
-                    <div class="mb-5 form-password-toggle form-control-validation">
-                        <div class="input-group input-group-merge">
-                            <div class="form-floating form-floating-outline">
-                                <input
-                                        type="password"
-                                        id="password"
-                                        class="form-control"
-                                        name="password"
-                                        placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                                        aria-describedby="password"/>
-                                <label for="password">Password</label>
-                            </div>
-                            <span class="input-group-text cursor-pointer"><i
-                                    class="icon-base ri ri-eye-off-line"></i></span>
-                        </div>
+
+                    <div class="mb-4">
+                        <label class="form-label" for="password">Password</label>
+                        <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-control"
+                                placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                                aria-describedby="password"/>
                     </div>
-                    <button class="btn btn-primary d-grid w-100">Login Admin</button>
+                    <button type="submit" class="btn btn-primary d-grid w-100">Login Admin</button>
                 </form>
             </div>
         </div>

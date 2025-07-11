@@ -6,47 +6,91 @@
 <div class="container-xxl flex-grow-1 container-p-y">
 
     <div class="d-flex flex-row justify-content-between mb-2">
-            <div class="card p-2" style="width: fit-content;">
-                <div class="d-flex gap-2 justify-content-around">
-                    <button type="button" class="btn btn-sm btn-primary">Lihat Wilayah</button>
-                    <button type="button" class="btn btn-sm btn-outline-primary">Tambah Wilayah</button>
-                </div>
+        <div class="card p-2" style="width: fit-content;">
+            <div class="d-flex gap-2 justify-content-around">
+                <button type="button" class="btn btn-sm {{ 'btn-primary' if wilayah == 'Provinsi' else 'btn-outline-primary' }}">Provinsi</button>
+                <button type="button" class="btn btn-sm {{ 'btn-primary' if wilayah == 'Kabupaten' else 'btn-outline-primary' }}">Kabupaten</button>
+                <button type="button" class="btn btn-sm {{ 'btn-primary' if wilayah == 'Kecamatan' else 'btn-outline-primary' }}">Kecamatan</button>
+                <button type="button" class="btn btn-sm {{ 'btn-primary' if wilayah == 'Kalurahan/Desa' else 'btn-outline-primary' }}">Kalurahan/Desa</button>
             </div>
+        </div>
         <div>
-            <button type="button" class="btn btn-sm btn-primary">Simpan Wilayah</button>
+            <button type="button" class="btn btn-sm btn-primary">Tambah</button>
         </div>
     </div>
 
     <div class="card">
-        <h5 class="card-header">Daftar Wilayah</h5>
-        <div class="table-responsive text-nowrap">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Lokasi</th>
-                    <th>Waktu</th>
-                    <th>Durasi Penyebaran</th>
-                    <th>Kadar Amonnia</th>
-                    <th>Notifikasi</th>
-                    <th>Progress</th>
-                </tr>
-                </thead>
-                <tbody class="table-border-bottom-0">
-                <tr>
-                    <td>1</td>
-                    <td>
-                        <i class="icon-base ri ri-bank-fill icon-22px text-primary me-4"></i><span>Bank Project</span>
-                    </td>
-                    <td>Jerry Milton</td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                </tr>
-                </tbody>
-            </table>
+        <h5 class="card-header">Daftar {{wilayah}}</h5>
+        <div class="d-flex flex-column px-4">
+            <div class="mb-4">
+                <form method="get">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex flex-row gap-2 w-100">
+                            <input
+                                    type="text"
+                                    name="search"
+                                    placeholder="Pencarian ..."
+                                    value="{{ search }}"
+                                    class="form-control form-control-sm w-25"/>
+                            <button type="submit" class="btn btn-sm btn-light">Cari</button>
+                        </div>
+                        <a href="{{ url_for(route) }}"
+                           class="btn btn-sm btn-outline-light text-black">Clear</a>
+                    </div>
+                </form>
+            </div>
+            <div class="table-responsive text-nowrap">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Provinsi</th>
+                        <th>Kabupaten</th>
+                        <th>Kecamatan</th>
+                        <th>Kelurahan/Desa</th>
+                        <th>Aksi</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                    {% for kelurahan, kecamatan, kabupaten, provinsi in pagination.items %}
+                    <tr>
+                        <td>{{ (pagination.page - 1) * pagination.per_page + loop.index }}</td>
+                        <td>{{ provinsi.name }}</td>
+                        <td>{{ kabupaten.name }}</td>
+                        <td>{{ kecamatan.name }}</td>
+                        <td>{{ kelurahan.name }}</td>
+                        <td>aksi</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex my-4 justify-content-end">
+                <nav>
+                <ul class="pagination">
+                    {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="{{ url_for(route, page=pagination.prev_num, search=search) }}">«</a>
+                    </li>
+                    {% endif %}
+
+                    {% for p in page_range %}
+                    <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for(route, page=p, search=search) }}">{{ p
+                            }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="{{ url_for(route, page=pagination.next_num, search=search) }}">»</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            </div>
         </div>
     </div>
-</div>
-{% endblock %}
+    {% endblock %}

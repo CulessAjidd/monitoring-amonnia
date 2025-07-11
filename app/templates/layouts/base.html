@@ -75,7 +75,7 @@
                 <a href="index.html" class="app-brand-link mt-10">
                               <span class="app-brand-logo demo">
                                 <span class="text-primary">
-                                  <img src="{{url_for('static', filename='logo/logo.png')}}" width="180" alt="">
+                                  <img src="{{url_for('static', filename='logo/logo.png')}}" width="180" alt="logo">
                                 </span>
                               </span>
                 </a>
@@ -571,7 +571,7 @@
                             <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);"
                                data-bs-toggle="dropdown">
                                 <div class="avatar avatar-online">
-                                    <img src="../../assets/img/avatars/1.png" alt="avatar" class="rounded-circle"/>
+                                    <img src="{{url_for('static', filename='img/avatars/1.png')}}" alt="avatar" class="rounded-circle"/>
                                 </div>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end mt-3 py-2">
@@ -581,7 +581,7 @@
                                             <div class="flex-shrink-0 me-2">
                                                 <div class="avatar avatar-online">
                                                     <img
-                                                            src="../../assets/img/avatars/1.png"
+                                                            src="{{url_for('static', filename='img/avatars/1.png')}}"
                                                             alt="alt"
                                                             class="w-px-40 h-auto rounded-circle"/>
                                                 </div>

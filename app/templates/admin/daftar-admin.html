@@ -12,26 +12,41 @@
                 <thead>
                 <tr>
                     <th>No</th>
-                    <th>Lokasi</th>
-                    <th>Waktu</th>
-                    <th>Durasi Penyebaran</th>
-                    <th>Kadar Amonnia</th>
-                    <th>Notifikasi</th>
-                    <th>Progress</th>
+                    <th>Akun Personel</th>
+                    <th>Kode Admin</th>
+                    <th>Wilayah Kabupaten</th>
+                    <th>Tanggal Mulai</th>
+                    <th>Status</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
+                {% for admin in admins %}
                 <tr>
-                    <td>1</td>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ admin.name }}</td>
+                    <td>{{ admin.kode_admin }}</td>
+                    <td>{{ admin.kabupaten.name }}</td>
+                    <td>{{ admin.created_at.strftime('%d %B %Y %H:%M') }}</td>
                     <td>
-                        <i class="icon-base ri ri-bank-fill icon-22px text-primary me-4"></i><span>Bank Project</span>
+                        {%if admin.status == 'Aktif'%}
+                        <span class="badge rounded-pill bg-label-success me-1">{{ admin.status }}</span>
+                        {%else%}
+                        <span class="badge rounded-pill bg-label-warning me-1">{{ admin.status }}</span>
+                        {%endif%}
                     </td>
-                    <td>Jerry Milton</td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
+                    <td>
+                        <div class="d-flex flex-row gap-2">
+                            <a class="dropdown-item" href="javascript:void(0);"
+                            ><i class="icon-base text-secondary ri ri-pencil-fill icon-25px me-1"></i></a
+                            >
+                            <a class="dropdown-item" href="javascript:void(0);"
+                            ><i class="icon-base text-danger ri ri-delete-bin-6-line icon-25px me-1"></i></a
+                            >
+                        </div>
+                    </td>
                 </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>

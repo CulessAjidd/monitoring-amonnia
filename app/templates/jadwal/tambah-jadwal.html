@@ -1,0 +1,162 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+
+    <div class="d-flex flex-row justify-content-between mb-2">
+        <div class="card p-2" style="width: fit-content;">
+            <div class="d-flex gap-2 justify-content-around">
+                <button type="button" class="btn btn-sm btn-outline-primary">Lihat Jadwal</button>
+                <button type="button" class="btn btn-sm btn-primary">Tambah Jadwal</button>
+            </div>
+        </div>
+        <div>
+            <button type="submit" form="tambah-jadwal" class="btn btn-sm btn-primary">Simpan Jadwal</button>
+        </div>
+    </div>
+    <form id="tambah-jadwal" method="POST">
+        {{ form.csrf_token }}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="d-flex flex-column gap-4">
+                    <div class="card">
+                        <h5 class="card-header">Waktu</h5>
+                        <hr>
+                        <div class="d-flex flex-row gap-2 justify-content-around px-4">
+                            <div class="mb-4 w-50">
+                                <label class="form-label" for="select-day">Pilih Hari</label>
+                                <select id="select-day" name="hari" class="form-select form-select-sm">
+                                    <option value="">Pilih Hari</option>
+                                    {%for day in days%}
+                                    <option value="{{day}}">{{day}}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+
+                            <div class="mb-4 w-50">
+                                <label class="form-label" for="collapsible-tanggal">Pilih Tanggal</label>
+                                <input
+                                        type="date"
+                                        name="tanggal"
+                                        id="collapsible-tanggal"
+                                        class="form-control form-control-sm"/>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row gap-2 justify-content-around px-4">
+                            <div class="mb-4 w-50">
+                                <label class="form-label" for="collapsible-jam-mulai">Pilih Jam Mulai</label>
+                                <input
+                                        type="time"
+                                        id="collapsible-jam-mulai"
+                                        name="jam-mulai"
+                                        class="form-control form-control-sm"/>
+                            </div>
+
+                            <div class="mb-4 w-50">
+                                <label class="form-label" for="collapsible-jam-selesai">Pilih Jam Selesai</label>
+                                <input
+                                        type="time"
+                                        name="jam-selesai"
+                                        id="collapsible-jam-selesai"
+                                        class="form-control form-control-sm"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h5 class="card-header">Pesan Notifikasi</h5>
+                        <hr>
+
+                        <div class="d-flex flex-column px-4">
+                            <div class="mb-4">
+                                <label class="form-label" for="collapsible-judul">Judul Notifikasi</label>
+                                <input
+                                        type="text"
+                                        id="collapsible-judul"
+                                        class="form-control form-control-sm"/>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label" for="textarea-desc">Deskripsi</label>
+                                <textarea
+                                        id="textarea-desc"
+                                        rows="5"
+                                        class="form-control"
+                                        placeholder="Tulis deskripsi lengkapnya disini !"
+                                        aria-label="Tulis deskripsi lengkapnya disini !"
+                                        aria-describedby="basic-icon-default-message2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex flex-column gap-4">
+                    <div class="card">
+                        <h5 class="card-header">Lokasi</h5>
+                        <hr>
+                        <div class="d-flex flex-row gap-2 justify-content-around px-4">
+                            <div class="mb-4 w-50">
+                                <label class="form-label" for="select-kecamatan">Pilih Kecamatan</label>
+                                <select id="select-kecamatan" class="form-select form-select-sm">
+                                    <option value="">Pilih Kecamatan</option>
+                                    {%for kec in kecamatan%}
+                                    <option value="{{kec.id}}">{{kec.name}}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+
+                            <div class="mb-4 w-50">
+                                <label class="form-label" for="select-kelurahan">Pilih Kelurahan</label>
+                                <select id="select-kelurahan" class="form-select form-select-sm">
+                                    <option>Rocky</option>
+                                    <option>Pulp Fiction</option>
+                                    <option>The Godfather</option>
+                                    <option>Breaking Bad</option>
+                                    <option>Black Mirror</option>
+                                    <option>Money Heist</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h5 class="card-header">Perkiraan Kadar</h5>
+                        <hr>
+                        <div class="d-flex flex-row gap-2 justify-content-around px-4">
+                            <div class="mb-4 w-50">
+                                <label class="form-label" for="collapsible-min">Minimal(%)</label>
+                                <input
+                                        type="number"
+                                        id="collapsible-min"
+                                        name="minimal"
+                                        placeholder="Minimal Kadar"
+                                        value="{{form.minimal.data}}"
+                                        class="form-control form-control-sm"/>
+
+                                {% if form.minimal.errors %}
+                                <div class="form-text text-danger">{{ form.minimal.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-4 w-50">
+                                <label class="form-label" for="collapsible-max">Maximal(%)</label>
+                                <input
+                                        type="number"
+                                        id="collapsible-max"
+                                        name="maximal"
+                                        placeholder="Maximal Kadar"
+                                        value="{{form.maximal.data}}"
+                                        class="form-control form-control-sm"/>
+                                {% if form.maximal.errors %}
+                                <div class="form-text text-danger">{{ form.maximal.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
