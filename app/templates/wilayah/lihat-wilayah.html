@@ -34,8 +34,8 @@
                                     class="form-control form-control-sm w-25"/>
                             <button type="submit" class="btn btn-sm btn-light">Cari</button>
                         </div>
-                        <a href="{{ url_for(route) }}"
-                           class="btn btn-sm btn-outline-light text-black">Clear</a>
+                        <a href="{{ url_for('wilayah.lihat_provinsi') }}"
+                           class="btn btn-sm btn-outline-light text-black w-20">Clear Pencarian</a>
                     </div>
                 </form>
             </div>
@@ -71,13 +71,13 @@
                     {% if pagination.has_prev %}
                     <li class="page-item">
                         <a class="page-link"
-                           href="{{ url_for(route, page=pagination.prev_num, search=search) }}">«</a>
+                           href="{{ url_for('wilayah.lihat_provinsi', page=pagination.prev_num, search=search) }}">«</a>
                     </li>
                     {% endif %}
 
                     {% for p in page_range %}
                     <li class="page-item {% if p == pagination.page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for(route, page=p, search=search) }}">{{ p
+                        <a class="page-link" href="{{ url_for('wilayah.lihat_provinsi', page=p, search=search) }}">{{ p
                             }}</a>
                     </li>
                     {% endfor %}
@@ -85,7 +85,7 @@
                     {% if pagination.has_next %}
                     <li class="page-item">
                         <a class="page-link"
-                           href="{{ url_for(route, page=pagination.next_num, search=search) }}">»</a>
+                           href="{{ url_for('wilayah.lihat_provinsi', page=pagination.next_num, search=search) }}">»</a>
                     </li>
                     {% endif %}
                 </ul>

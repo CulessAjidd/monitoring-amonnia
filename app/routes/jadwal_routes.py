@@ -11,7 +11,10 @@ def lihat_jadwal():
     # if 'user_id' not in session:
     #     return redirect(url_for('auth.login'))
     # user = User.query.get(session['user_id'])
-    return render_template('jadwal/lihat-jadwal.html')
+    return render_template('jadwal/lihat-jadwal.html',
+                           title='Jadwal',
+                           subtitle='Jadwal Penyebaran / Lihat Jadwal',
+                           )
 
 
 @jadwal_bp.route('/jadwal/tambah', methods=['GET', 'POST'])
@@ -40,6 +43,8 @@ def tambah_jadwal():
     # )
 
     return render_template('jadwal/tambah-jadwal.html',
+                           title='Jadwal',
+                           subtitle = 'Jadwal Penyebaran / Tambah Jadwal',
                            days = days,
                            kecamatan = kecamatan,
                            form = form)

@@ -17,4 +17,7 @@ def lihat_admin():
 
     admins = User.query.join(Role).join(Kabupaten).filter(Role.name == 'admin').order_by(User.id.desc()).all()
 
-    return render_template('admin/daftar-admin.html', admins=admins)
+    return render_template('admin/daftar-admin.html',
+                           title='Admin',
+                           subtitle='Admin / Lihat Admin',
+                           admins=admins)

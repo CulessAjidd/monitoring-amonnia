@@ -13,5 +13,8 @@ def lihat_masyarakat():
     # if 'user_id' not in session:
     #     return redirect(url_for('auth.login'))
     # user = User.query.get(session['user_id'])
-    return render_template('masyarakat/lihat-masyarakat.html')
+    return render_template('masyarakat/lihat-masyarakat.html',
+                           title='Masyarakat',
+                           subtitle='Masyarakat / Lihat Masyarakat',
+                           )
 

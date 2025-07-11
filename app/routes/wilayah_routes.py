@@ -11,7 +11,7 @@ from app import db
 
 wilayah_bp = Blueprint('wilayah', __name__)
 
-@wilayah_bp.route('/provinsi', methods=['GET'])
+@wilayah_bp.route('/wilayah/provinsi', methods=['GET'])
 def lihat_provinsi():
     # if 'user_id' not in session:
     #     return redirect(url_for('auth.login'))
@@ -57,6 +57,8 @@ def lihat_provinsi():
         })
 
     return render_template('wilayah/lihat-wilayah.html',
+                           title='Wilayah',
+                           subtitle='Wilayah / Provinsi',
                            pagination=pagination,
                            search=search,
                            page_range=page_range
