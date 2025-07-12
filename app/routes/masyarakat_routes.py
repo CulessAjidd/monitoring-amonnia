@@ -151,6 +151,10 @@ def delete_masyarakat(id):
 def generate_unique_kode_admin():
     while True:
         code = str(random.randint(1000, 9999))
-        is_empty = User.query.filter_by(kode_admin=code).first()
+        is_empty = (db.session.query(User)
+             .join(Role, User.role_id == Role.id)
+             .filter(
+                Role.name == 'masyarakat',
+            ).order_by(User.kode_admin.desc()).first())
         if not is_empty:
             return code

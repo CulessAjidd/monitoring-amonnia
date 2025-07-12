@@ -5,8 +5,26 @@
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
 
+    <div class="d-flex flex-row justify-content-between mb-2">
+        <div>
+            <a href="{{ url_for('admin.tambah_admin') }}" class="btn btn-sm btn-primary">Tambah Admin</a>
+        </div>
+    </div>
     <div class="card">
         <h5 class="card-header">Admin</h5>
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible"
+                 role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
         <div class="table-responsive text-nowrap">
             <table class="table">
                 <thead>
@@ -14,10 +32,9 @@
                     <th>No</th>
                     <th>Akun Personel</th>
                     <th>Kode Admin</th>
+                    <th>Wilayah Provinsi</th>
                     <th>Wilayah Kabupaten</th>
                     <th>Tanggal Mulai</th>
-                    <th>Status</th>
-                    <th></th>
                 </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
@@ -26,25 +43,9 @@
                     <td>{{ loop.index }}</td>
                     <td>{{ admin.name }}</td>
                     <td>{{ admin.kode_admin }}</td>
+                    <td>{{ admin.kabupaten.provinsi.name }}</td>
                     <td>{{ admin.kabupaten.name }}</td>
                     <td>{{ admin.created_at.strftime('%d %B %Y %H:%M') }}</td>
-                    <td>
-                        {%if admin.status == 'Aktif'%}
-                        <span class="badge rounded-pill bg-label-success me-1">{{ admin.status }}</span>
-                        {%else%}
-                        <span class="badge rounded-pill bg-label-warning me-1">{{ admin.status }}</span>
-                        {%endif%}
-                    </td>
-                    <td>
-                        <div class="d-flex flex-row gap-2">
-                            <a class="dropdown-item" href="javascript:void(0);"
-                            ><i class="icon-base text-secondary ri ri-pencil-fill icon-25px me-1"></i></a
-                            >
-                            <a class="dropdown-item" href="javascript:void(0);"
-                            ><i class="icon-base text-danger ri ri-delete-bin-6-line icon-25px me-1"></i></a
-                            >
-                        </div>
-                    </td>
                 </tr>
                 {% endfor %}
                 </tbody>

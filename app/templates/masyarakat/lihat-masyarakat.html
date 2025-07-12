@@ -70,13 +70,8 @@
                     <td>{{ user.kecamatan.name }}</td>
                     <td>{{ user.kelurahan.name }}</td>
                     <td class="text-center">
-                        {% if user.status == 'Aktif'%}
                         <span
-                                class="badge rounded-pill bg-label-success me-1">{{ user.status }}</span>
-                        {% else%}
-                        <span
-                                class="badge rounded-pill bg-label-danger me-1">{{ user.status }}</span>
-                        {% endif%}
+                                class="badge rounded-pill bg-label-{{ 'success' if user.status == 'Aktif' else 'danger' }} me-1">{{ user.status }}</span>
                     </td>
                     <td>
                         <div class="d-flex flex-row gap-2">

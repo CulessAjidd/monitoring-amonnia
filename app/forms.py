@@ -95,3 +95,58 @@ class MasyarakatForm(FlaskForm):
             ).first()
             if user:
                 raise ValidationError('Email sudah digunakan.')
+
+class AdminCreateForm(FlaskForm):
+    original_email = None
+    provinsi = StringField('Provinsi',
+                            validators=[DataRequired(message='Provinsi harus diisi')])
+
+    kabupaten = StringField('Kabupaten',
+                           validators=[DataRequired(message='Kabupaten harus diisi')])
+
+    name = StringField('Nama', validators=[DataRequired(message='Nama harus diisi')])
+
+    email = StringField('Email', validators=[
+        DataRequired(message="Email wajib diisi"),
+        Email(message="Format email tidak valid"),
+        Length(max=100)
+    ])
+
+    password = StringField('Password', validators=[
+        DataRequired(message="Password wajib diisi"),
+        Length(min=6, message="Password minimal 6 karakter")
+    ])
+
+    submit = SubmitField('Tambah')
+
+    def validate_email(self, field):
+        if field.data != self.original_email:
+            user = User.query.filter(
+                User.email == field.data,
+                User.deleted_at == None
+            ).first()
+            if user:
+                raise ValidationError('Email sudah digunakan.')
+
+class AdminUpdateForm(FlaskForm):
+    original_email = None
+    name = StringField('Nama', validators=[DataRequired(message='Nama harus diisi')])
+
+    email = StringField('Email', validators=[
+        DataRequired(message="Email wajib diisi"),
+        Email(message="Format email tidak valid"),
+        Length(max=100)
+    ])
+
+    password = StringField('Password')
+
+    submit = SubmitField('Tambah')
+
+    def validate_email(self, field):
+        if field.data != self.original_email:
+            user = User.query.filter(
+                User.email == field.data,
+                User.deleted_at == None
+            ).first()
+            if user:
+                raise ValidationError('Email sudah digunakan.')

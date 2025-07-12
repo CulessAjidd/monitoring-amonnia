@@ -69,6 +69,7 @@ def lihat_jadwal():
             "kadar_min": jadwal.kadar_min,
             "kadar_max": jadwal.kadar_max,
             "status": jadwal.status,
+            "status_kadar": jadwal.status_kadar,
         })
     return render_template('jadwal/lihat-jadwal.html',
                            title='Jadwal',
@@ -89,6 +90,7 @@ def tambah_jadwal():
     kecamatan = Kecamatan.query.filter_by(kabupaten_id=current_user.kabupaten_id).order_by(Kecamatan.name.asc()).all()
 
     if form.validate_on_submit():
+        status_kadar = get_status(form.maximal.data)
         jadwal = Jadwal(
             title=form.title.data,
             description=form.description.data,
@@ -100,7 +102,8 @@ def tambah_jadwal():
             kecamatan_id=form.kecamatan.data,
             kelurahan_id=form.kelurahan.data,
             kadar_min=form.minimal.data,
-            kadar_max=form.maximal.data
+            kadar_max=form.maximal.data,
+            status_kadar=status_kadar,
         )
 
         db.session.add(jadwal)
@@ -126,6 +129,7 @@ def edit_jadwal(id):
     kecamatan = Kecamatan.query.filter_by(kabupaten_id=current_user.kabupaten_id).order_by(Kecamatan.name.asc()).all()
 
     if form.validate_on_submit():
+        status_kadar = get_status(form.maximal.data)
         jadwal.title = form.title.data
         jadwal.description = form.description.data
         jadwal.hari = form.hari.data
@@ -137,6 +141,7 @@ def edit_jadwal(id):
         jadwal.jam_mulai = form.jam_mulai.data
         jadwal.jam_selesai = form.jam_selesai.data
         jadwal.user_id = current_user.id
+        jadwal.status_kadar = status_kadar
 
         db.session.commit()
         flash('Jadwal berhasil diperbahrui', 'success')
@@ -193,7 +198,8 @@ def send_jadwal(id):
             "durasi": f"{jam} jam {menit} menit",
             "kadar": f"{jadwal.kadar_min}% - {jadwal.kadar_max}%",
             "kecamatan": jadwal.kecamatan.name,
-            "kelurahan": jadwal.kelurahan.name
+            "kelurahan": jadwal.kelurahan.name,
+            "status_kadar": jadwal.status_kadar
         }
 
         email_list = (
@@ -223,3 +229,12 @@ def send_jadwal(id):
     except Exception as e:
         flash('Notifikasi gagal dikirim', 'danger')
         return redirect(url_for('jadwal.lihat_jadwal'))
+
+
+def get_status(kadar):
+    if kadar < 19:
+        return "Aman"
+    elif 19 <= kadar < 21:
+        return "Awas"
+    else:
+        return "Berbahaya"

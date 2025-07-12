@@ -165,3 +165,11 @@ def get_ajax_kelurahan(kecamatan_id):
     result = [{"id": k.id, "name": k.name} for k in kelurahan]
 
     return jsonify(kelurahan=result)
+
+@wilayah_bp.route('/ajax/kabupaten/<int:provinsi_id>', methods=['GET'])
+@login_required
+def get_ajax_kabupaten(provinsi_id):
+    kabupaten = Kabupaten.query.filter_by(provinsi_id=provinsi_id).order_by(Kabupaten.name.asc()).all()
+    result = [{"id": k.id, "name": k.name} for k in kabupaten]
+
+    return jsonify(kabupaten=result)

@@ -203,11 +203,11 @@
                         $('#select-kelurahan').html(options);
                     },
                     error: function () {
-                        $('#select-kelurahan').html('<option value="">Gagal memuat kabupaten</option>');
+                        $('#select-kelurahan').html('<option value="">Gagal memuat kelurahan</option>');
                     }
                 });
             } else {
-                $('#select-kelurahan').html('<option value="">Pilih Kabupaten</option>');
+                $('#select-kelurahan').html('<option value="">Pilih Kelurahan</option>');
             }
         });
         var selectedKecamatanId = "{{ request.form.get('kecamatan', '') }}";

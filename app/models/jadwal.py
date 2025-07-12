@@ -13,7 +13,7 @@ class Jadwal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    hari = db.Column(db.String(50), unique=True, nullable=False)
+    hari = db.Column(db.String(50), nullable=False)
     tanggal = db.Column(db.Date, nullable=True)
     jam_mulai = db.Column(db.Time, nullable=True)
     jam_selesai = db.Column(db.Time, nullable=False)
@@ -23,6 +23,7 @@ class Jadwal(db.Model):
     kadar_min = db.Column(db.Integer, nullable=False)
     kadar_max = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(20), nullable=False, default='Belum Terkirim')
+    status_kadar = db.Column(db.String(20), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(ZoneInfo("Asia/Jakarta")))
     deleted_at = db.Column(db.DateTime, nullable=True)
 

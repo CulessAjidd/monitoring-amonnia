@@ -1,0 +1,130 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+
+    <div class="d-flex flex-row justify-content-between mb-2">
+        <div>
+            <a href="{{ url_for('admin.lihat_admin') }}" class="btn btn-sm btn-outline-primary">Lihat Admin</a>
+        </div>
+        <div>
+            <button type="submit" form="tambah-admin" class="btn btn-sm btn-primary">Simpan Admin</button>
+        </div>
+    </div>
+    <form id="tambah-admin" method="POST">
+        {{ form.csrf_token }}
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="card px-4">
+                    <h5 class="card-header">Data Admin</h5>
+                    <hr>
+                    <div class="mb-4">
+                        <label class="form-label" for="collapsible-name">Nama</label>
+                        <input
+                                type="text"
+                                name="name"
+                                id="collapsible-name"
+                                value="{{ form.name.data or '' }}"
+                                class="form-control form-control-sm"/>
+                        {% if form.name.errors %}
+                        <div class="form-text text-danger">{{ form.name.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" for="collapsible-email">Email</label>
+                        <input
+                                type="email"
+                                name="email"
+                                id="collapsible-email"
+                                value="{{ form.email.data or '' }}"
+                                class="form-control form-control-sm"/>
+                        {% if form.email.errors %}
+                        <div class="form-text text-danger">{{ form.email.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" for="collapsible-password">Password</label>
+                        <input
+                                type="password"
+                                name="password"
+                                id="collapsible-password"
+                                value="{{ form.password.data or '' }}"
+                                class="form-control form-control-sm"/>
+                        {% if form.password.errors %}
+                        <div class="form-text text-danger">{{ form.password.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex flex-column gap-4">
+                    <div class="card">
+                        <h5 class="card-header">Wilayah Kerja</h5>
+                        <hr>
+                        <div class="d-flex flex-row gap-2 justify-content-around px-4">
+                            <div class="mb-4 w-50">
+                                <label class="form-label" for="select-provinsi">Pilih Provinsi</label>
+                                <select id="select-provinsi" name="provinsi" class="form-select form-select-sm">
+                                    <option value="">Pilih Provinsi</option>
+                                    {%for provinsi in provinsis%}
+                                    <option value="{{provinsi.id}}" {% if provinsi.id== form.provinsi.data %}selected{%
+                                            endif %}>{{provinsi.name}}
+                                    </option>
+                                    {%endfor%}
+                                </select>
+                                {% if form.provinsi.errors %}
+                                <div class="form-text text-danger">{{ form.provinsi.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-4 w-50">
+                                <label class="form-label" for="select-kabupaten">Pilih Kabupaten</label>
+                                <select id="select-kabupaten" name="kabupaten" class="form-select form-select-sm">
+                                    <option value="">Pilih Kabupaten</option>
+                                </select>
+                                {% if form.kabupaten.errors %}
+                                <div class="form-text text-danger">{{ form.kabupaten.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $(document).ready(function () {
+        var selectedKabupatenId = "{{ request.form.get('kabupaten', '') }}";
+        $('#select-provinsi').on('change', function () {
+            var provinsiId = $(this).val();
+            $('#select-kabupaten').html('<option value="">Loading...</option>');
+            if (provinsiId) {
+                $.ajax({
+                    url: '/ajax/kabupaten/' + provinsiId,
+                    type: 'GET',
+                    success: function (data) {
+                        var options = '<option value="">Pilih Kabupaten</option>';
+                        $.each(data.kabupaten, function (i, kab) {
+                            var selected = (kab.id == selectedKabupatenId) ? 'selected' : '';
+                            options += '<option value="' + kab.id + '" ' + selected + '>' + kab.name + '</option>';
+                        });
+                        $('#select-kabupaten').html(options);
+                    },
+                    error: function () {
+                        $('#select-kabupaten').html('<option value="">Gagal memuat kabupaten</option>');
+                    }
+                });
+            } else {
+                $('#select-kabupaten').html('<option value="">Pilih Kabupaten</option>');
+            }
+        });
+        var selectedProvinsiId = "{{ request.form.get('provinsi', '') }}";
+        if (selectedProvinsiId) {
+            $('#select-provinsi').val(selectedProvinsiId).trigger('change');
+        }
+    });
+</script>
+{% endblock %}

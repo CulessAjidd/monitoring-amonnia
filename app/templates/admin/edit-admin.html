@@ -1,0 +1,74 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+
+    <div class="d-flex flex-row justify-content-end mb-2">
+        <div>
+            <button type="submit" form="update-profile" class="btn btn-sm btn-primary">Perbahrui Profile</button>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-sm-6">
+            <div class="card px-4">
+                <h5 class="card-header">Data Admin</h5>
+                <div class="container">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible"
+                         role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                </div>
+                <hr>
+                <form id="update-profile" method="POST">
+                    {{ form.csrf_token }}
+                    <div class="mb-4">
+                        <label class="form-label" for="collapsible-name">Nama</label>
+                        <input
+                                type="text"
+                                name="name"
+                                id="collapsible-name"
+                                value="{{ form.name.data or '' }}"
+                                class="form-control form-control-sm"/>
+                        {% if form.name.errors %}
+                        <div class="form-text text-danger">{{ form.name.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" for="collapsible-email">Email</label>
+                        <input
+                                type="email"
+                                name="email"
+                                id="collapsible-email"
+                                value="{{ form.email.data or '' }}"
+                                class="form-control form-control-sm"/>
+                        {% if form.email.errors %}
+                        <div class="form-text text-danger">{{ form.email.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" for="collapsible-password">Password</label>
+                        <input
+                                type="password"
+                                name="password"
+                                id="collapsible-password"
+                                value="{{ form.password.data or '' }}"
+                                class="form-control form-control-sm"/>
+                        {% if form.password.errors %}
+                        <div class="form-text text-danger">{{ form.password.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
