@@ -10,21 +10,21 @@
             <div class="d-flex gap-2 justify-content-around">
                 <a href="{{url_for('masyarakat.lihat_masyarakat')}}" class="btn btn-sm btn-outline-primary">Lihat
                     Mayarakat</a>
-                <a href="{{url_for('masyarakat.tambah_masyarakat')}}" class="btn btn-sm btn-primary">Tambah
+                <a href="{{url_for('masyarakat.tambah_masyarakat')}}" class="btn btn-sm btn-outline-primary">Tambah
                     Masyarakat</a>
             </div>
         </div>
         <div>
-            <button type="submit" form="tambah-masyarakat" class="btn btn-sm btn-primary">Simpan Masyarakat</button>
+            <button type="submit" form="edit-masyarakat" class="btn btn-sm btn-primary">Perbahrui Masyarakat</button>
         </div>
     </div>
-    <form id="tambah-masyarakat" method="POST">
+    <form id="edit-masyarakat" method="POST">
         {{ form.csrf_token }}
         <div class="row">
             <div class="col-md-6">
                 <div class="d-flex flex-column gap-4">
                     <div class="card">
-                        <h5 class="card-header">Tamabah Data Masyarakat</h5>
+                        <h5 class="card-header">Edit Data Masyarakat</h5>
                         <hr>
 
                         <div class="d-flex flex-column px-4">
@@ -48,6 +48,7 @@
                                         <label class="form-label" for="select-kecamatan">Pilih Status</label>
                                         <select name="status"
                                                 class="form-select form-select-sm">
+                                            {% set options = ['Aktif', 'Tidak Aktif'] %}
                                             <option value="">Pilih Status</option>
                                             <option value="Aktif" {% if form.status.data == 'Aktif' %}selected{% endif %}>Aktif</option>
                                             <option value="Tidak Aktif" {% if form.status.data == 'Tidak Aktif' %}selected{% endif %}>Tidak Aktif</option>
@@ -113,7 +114,7 @@
 </div>
 <script>
     $(document).ready(function () {
-        var selectedKelurahanId = "{{ request.form.get('kelurahan', '') }}";
+        var selectedKelurahanId = "{{ form.kelurahan.data }}";
         $('#select-kecamatan').on('change', function () {
             var kecamatanId = $(this).val();
             $('#select-kelurahan').html('<option value="">Loading...</option>');
@@ -137,7 +138,7 @@
                 $('#select-kelurahan').html('<option value="">Pilih Kabupaten</option>');
             }
         });
-        var selectedKecamatanId = "{{ request.form.get('kecamatan', '') }}";
+        var selectedKecamatanId = "{{ form.kecamatan.data }}";
         if (selectedKecamatanId) {
             $('#select-kecamatan').val(selectedKecamatanId).trigger('change');
         }

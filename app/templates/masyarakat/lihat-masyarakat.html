@@ -69,14 +69,21 @@
                     <td>{{ user.email }}</td>
                     <td>{{ user.kecamatan.name }}</td>
                     <td>{{ user.kelurahan.name }}</td>
-                    <td class="text-center"><span
-                            class="badge rounded-pill bg-label-success me-1">{{ user.status }}</span></td>
+                    <td class="text-center">
+                        {% if user.status == 'Aktif'%}
+                        <span
+                                class="badge rounded-pill bg-label-success me-1">{{ user.status }}</span>
+                        {% else%}
+                        <span
+                                class="badge rounded-pill bg-label-danger me-1">{{ user.status }}</span>
+                        {% endif%}
+                    </td>
                     <td>
                         <div class="d-flex flex-row gap-2">
-                            <a class="dropdown-item" href="javascript:void(0);"
+                            <a class="dropdown-item" href="{{ url_for('masyarakat.edit_masyarakat', id=user.id) }}"
                             ><i class="icon-base text-secondary ri ri-pencil-fill icon-25px me-1"></i></a
                             >
-                            <a class="dropdown-item" href="javascript:void(0);"
+                            <a class="dropdown-item btn-delete" data-id="{{user.id}}" href="javascript:void(0);"
                             ><i class="icon-base text-danger ri ri-delete-bin-6-line icon-25px me-1"></i></a
                             >
                         </div>
@@ -115,4 +122,28 @@
         </div>
     </div>
 </div>
+<script>
+    $('.btn-delete').click(function () {
+        const userId = $(this).data('id');
+
+        if (confirm('Yakin ingin menghapus masyarakat ini?')) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                url: '/masyarakat/hapus/' + userId,
+                type: 'DELETE',
+                success: function (res) {
+                    alert(res.message);
+                    location.reload();
+                },
+                error: function () {
+                    alert('Gagal menghapus masyarakat.');
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

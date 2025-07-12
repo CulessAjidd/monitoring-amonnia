@@ -1,6 +1,7 @@
 import sys
+from zoneinfo import ZoneInfo
 
-from flask import Blueprint, render_template, redirect, request, url_for, session, flash
+from flask import Blueprint, render_template, redirect, request, url_for, session, flash, jsonify
 from flask_login import login_required, current_user
 
 from app.forms import MasyarakatForm
@@ -10,6 +11,7 @@ from app.models.role import Role
 from app.models.user import User
 from app import db
 import random
+from datetime import datetime
 
 masyarakat_bp = Blueprint('masyarakat', __name__)
 
@@ -25,8 +27,10 @@ def lihat_masyarakat():
              .join(Kecamatan, User.kecamatan_id == Kecamatan.id)
              .join(Kelurahan, User.kelurahan_id == Kelurahan.id)
              .join(Role, User.role_id == Role.id)
-             .filter(Role.name == 'masyarakat')
-             .order_by(User.id.desc()))
+             .filter(
+                Role.name == 'masyarakat',
+                User.deleted_at == None
+            ).order_by(User.id.desc()))
 
     if search:
         like = f"%{search}%"
@@ -97,6 +101,50 @@ def tambah_masyarakat():
                            form=form,
                            kecamatan=kecamatan,
                            )
+
+@masyarakat_bp.route('/masyarakat/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_masyarakat(id):
+
+    user = User.query.get_or_404(id)
+    form = MasyarakatForm(obj=user)
+    form.original_email = user.email
+
+    kecamatan = Kecamatan.query.filter_by(kabupaten_id=current_user.kabupaten_id).order_by(Kecamatan.name.asc()).all()
+
+    if form.validate_on_submit():
+        user.name=form.name.data
+        user.email=form.email.data
+        user.kecamatan_id=form.kecamatan.data
+        user.kelurahan_id=form.kelurahan.data
+        user.status=form.status.data
+
+        db.session.commit()
+
+        flash('Masyarakat berhasil diperbahrui', 'success')
+        return redirect(url_for('masyarakat.lihat_masyarakat'))
+
+    form.name.data = user.name
+    form.email.data = user.email
+    form.kecamatan.data = user.kecamatan_id
+    form.kelurahan.data = user.kelurahan_id
+    form.status.data = user.status
+
+    return render_template('masyarakat/edit-masyarakat.html',
+                           title='Masyarakat',
+                           subtitle='Masyarakat / Edit Masyarakat',
+                           form=form,
+                           kecamatan=kecamatan,
+                           user=user,
+                           )
+
+@masyarakat_bp.route('/masyarakat/hapus/<int:id>', methods=['DELETE'])
+def delete_masyarakat(id):
+    user = User.query.get_or_404(id)
+    user.deleted_at = datetime.now(ZoneInfo("Asia/Jakarta"))
+
+    db.session.commit()
+    return jsonify({'message': 'Masyarakat berhasil dihapus'})
 
 
 def generate_unique_kode_admin():

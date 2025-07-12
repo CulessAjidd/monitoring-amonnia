@@ -5,6 +5,8 @@ from wtforms.fields.simple import StringField, SubmitField, PasswordField
 from wtforms.validators import DataRequired, ValidationError, Email, Length
 from datetime import datetime, date
 
+from app.models.user import User
+
 
 class JadwalForm(FlaskForm):
     hari = StringField('Hari', validators=[DataRequired(message='Hari harus dipilih')])
@@ -58,6 +60,8 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 class MasyarakatForm(FlaskForm):
+    original_email = None
+
     kecamatan = StringField('Kecamatan',
                             validators=[DataRequired(message='Kecamatan harus diisi')])
     kelurahan = StringField('Kelurahan',
@@ -72,3 +76,12 @@ class MasyarakatForm(FlaskForm):
     name = StringField('Nama', validators=[DataRequired(message='Nama harus diisi')])
 
     submit = SubmitField('Tambah')
+
+    def validate_email(self, field):
+        if field.data != self.original_email:
+            user = User.query.filter(
+                User.email == field.data,
+                User.deleted_at == None
+            ).first()
+            if user:
+                raise ValidationError('Email sudah digunakan.')
