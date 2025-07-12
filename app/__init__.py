@@ -33,6 +33,7 @@ def create_app():
     csrf.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
+    login_manager.login_message = "Silakan login terlebih dahulu untuk mengakses halaman."
 
 
     app.register_blueprint(auth_bp)

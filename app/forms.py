@@ -59,6 +59,16 @@ class LoginForm(FlaskForm):
     ])
     submit = SubmitField('Login')
 
+class KecamatanForm(FlaskForm):
+    name = StringField('Nama Kecamatan',
+                            validators=[DataRequired(message='Kecamatan harus diisi')])
+
+class KelurahanForm(FlaskForm):
+    kecamatan_id = StringField('ID Kecamatan',
+                                 validators=[DataRequired(message='Kecamatan harus diisi')])
+    name = StringField('Nama Kelurahan',
+                       validators=[DataRequired(message='Kelurahan harus diisi')])
+
 class MasyarakatForm(FlaskForm):
     original_email = None
 

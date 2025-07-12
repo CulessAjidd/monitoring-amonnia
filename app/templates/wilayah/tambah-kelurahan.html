@@ -1,0 +1,58 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+
+    <div class="d-flex flex-row justify-content-between mb-2">
+        <div>
+            <a href="{{ url_for('wilayah.lihat_kelurahan', id=kecamatan.id) }}" class="btn btn-sm btn-outline-primary">Lihat Kelurahan</a>
+        </div>
+        <div>
+            <button type="submit" form="tambah-kelurahan" class="btn btn-sm btn-primary">Simpan Kelurahan</button>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-sm-6">
+            <div class="card">
+                <h5 class="card-header">Data Tambah Kelurahan</h5>
+                <hr>
+                <form id="tambah-kelurahan" method="POST">
+                    {{ form.csrf_token }}
+                    <div class="m-4">
+                        {{ form.kecamatan_id(type="hidden") }}
+                        <label class="form-label" for="collapsible-nama-kec">Nama Kecamatan</label>
+                        <input
+                                type="text"
+                                name="kecamatan_name"
+                                id="collapsible-nama-kec"
+                                value="{{ kecamatan.name}}"
+                                class="form-control form-control-sm w-full"
+                                disabled readonly
+                        />
+                        {% if form.kecamatan_id.errors %}
+                        <div class="form-text text-danger">{{ form.kecamatan_id.errors[0] }}</div>
+                        {% endif %}
+
+                    </div>
+                    <div class="m-4">
+                        <label class="form-label" for="collapsible-nama">Nama Kelurahan</label>
+                        <input
+                                type="text"
+                                name="name"
+                                id="collapsible-nama"
+                                value="{{ form.name.data or ''}}"
+                                class="form-control form-control-sm w-full"/>
+                        {% if form.name.errors %}
+                        <div class="form-text text-danger">{{ form.name.errors[0] }}</div>
+                        {% endif %}
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
