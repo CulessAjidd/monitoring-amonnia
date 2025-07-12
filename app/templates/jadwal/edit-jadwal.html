@@ -9,14 +9,14 @@
         <div class="card p-2" style="width: fit-content;">
             <div class="d-flex gap-2 justify-content-around">
                 <a href="{{url_for('jadwal.lihat_jadwal')}}" class="btn btn-sm btn-outline-primary">Lihat Jadwal</a>
-                <a href="{{url_for('jadwal.tambah_jadwal')}}" class="btn btn-sm btn-primary">Tambah Jadwal</a>
+                <a href="{{url_for('jadwal.tambah_jadwal')}}" class="btn btn-sm btn-outline-primary">Tambah Jadwal</a>
             </div>
         </div>
         <div>
-            <button type="submit" form="tambah-jadwal" class="btn btn-sm btn-primary">Simpan Jadwal</button>
+            <button type="submit" form="edit-jadwal" class="btn btn-sm btn-primary">Perbahrui Jadwal</button>
         </div>
     </div>
-    <form id="tambah-jadwal" method="POST">
+    <form id="edit-jadwal" method="POST">
         {{ form.csrf_token }}
         <div class="row">
             <div class="col-md-6">
@@ -58,7 +58,7 @@
                                         type="time"
                                         id="collapsible-jam-mulai"
                                         name="jam_mulai"
-                                        value="{{ form.jam_mulai.data }}"
+                                        value="{{ form.jam_mulai.data.strftime('%H:%M') }}"
                                         class="form-control form-control-sm"/>
                                 {% if form.jam_mulai.errors %}
                                 <div class="form-text text-danger">{{ form.jam_mulai.errors[0] }}</div>
@@ -70,7 +70,7 @@
                                 <input
                                         type="time"
                                         name="jam_selesai"
-                                        value="{{ form.jam_selesai.data }}"
+                                        value="{{ form.jam_selesai.data.strftime('%H:%M') }}"
                                         id="collapsible-jam-selesai"
                                         class="form-control form-control-sm"/>
                                 {% if form.jam_selesai.errors %}
@@ -186,7 +186,7 @@
 </div>
 <script>
     $(document).ready(function () {
-        var selectedKelurahanId = "{{ request.form.get('kelurahan', '') }}";
+        var selectedKelurahanId = "{{ form.kelurahan.data }}";
         $('#select-kecamatan').on('change', function () {
             var kecamatanId = $(this).val();
             $('#select-kelurahan').html('<option value="">Loading...</option>');
@@ -210,10 +210,11 @@
                 $('#select-kelurahan').html('<option value="">Pilih Kabupaten</option>');
             }
         });
-        var selectedKecamatanId = "{{ request.form.get('kecamatan', '') }}";
+        var selectedKecamatanId = "{{ form.kecamatan.data }}";
         if (selectedKecamatanId) {
             $('#select-kecamatan').val(selectedKecamatanId).trigger('change');
         }
     });
 </script>
+
 {% endblock %}

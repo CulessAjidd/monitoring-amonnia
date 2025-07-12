@@ -1,3 +1,5 @@
+from zoneinfo import ZoneInfo
+
 from flask import Blueprint, render_template, flash, redirect, request, url_for, session, jsonify
 from flask_login import login_required, current_user
 from datetime import datetime, date
@@ -21,6 +23,7 @@ def lihat_jadwal():
     query = (db.session.query(Jadwal)
          .join(Kecamatan, Jadwal.kecamatan_id == Kecamatan.id)
          .join(Kelurahan, Jadwal.kelurahan_id == Kelurahan.id)
+        .filter(Jadwal.deleted_at == None)
          .order_by(Jadwal.id.desc()))
 
     if search:
@@ -28,7 +31,8 @@ def lihat_jadwal():
         query = query.filter(
             Kelurahan.name.ilike(like) |
             Kecamatan.name.ilike(like) |
-            Jadwal.tanggal.ilike(like)
+            Jadwal.tanggal.ilike(like) |
+            Jadwal.status.ilike(like)
         )
 
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
@@ -52,6 +56,7 @@ def lihat_jadwal():
         jam = int(total_menit // 60)
         menit = int(total_menit % 60)
         results.append({
+            "id": jadwal.id,
             "tanggal": jadwal.tanggal,
             "kecamatan": jadwal.kecamatan.name,
             "kelurahan": jadwal.kelurahan.name,
@@ -60,6 +65,7 @@ def lihat_jadwal():
             "kadar": f"{jadwal.kadar_min}% - {jadwal.kadar_max}%",
             "kadar_min": jadwal.kadar_min,
             "kadar_max": jadwal.kadar_max,
+            "status": jadwal.status,
         })
     return render_template('jadwal/lihat-jadwal.html',
                            title='Jadwal',
@@ -114,6 +120,72 @@ def tambah_jadwal():
                            days = days,
                            kecamatan = kecamatan,
                            form = form)
+
+@jadwal_bp.route('/jadwal/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_jadwal(id):
+
+    jadwal = Jadwal.query.get_or_404(id)
+    form = JadwalForm()
+
+    days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumad', 'Sabtu', 'Minggu']
+    kecamatan = Kecamatan.query.filter_by(kabupaten_id=current_user.kabupaten_id).order_by(Kecamatan.name.asc()).all()
+
+    if form.validate_on_submit():
+
+        jadwal.title = form.title.data
+        jadwal.description = form.description.data
+        jadwal.hari = form.hari.data
+        jadwal.tanggal = form.tanggal.data
+        jadwal.kecamatan_id = form.kecamatan.data
+        jadwal.kelurahan_id = form.kelurahan.data
+        jadwal.kadar_min = form.minimal.data
+        jadwal.kadar_max = form.maximal.data
+        jadwal.jam_mulai = form.jam_mulai.data
+        jadwal.jam_selesai = form.jam_selesai.data
+        jadwal.user_id = current_user.id
+
+        db.session.commit()
+        flash('Jadwal berhasil diperbahrui', 'success')
+        return redirect(url_for('jadwal.lihat_jadwal'))
+
+    # result = send_email(
+    #     subject="Selamat Datang di Aplikasi Kami",
+    #     recipients=["muhajidachmad@gmail.com"],
+    #     template_name="emails/info.html",
+    #     context={"username": "Ajid"},
+    #     bcc=["ajid.developer@gmail.com"]
+    # )
+
+    form.title.data = jadwal.title
+    form.description.data = jadwal.description
+    form.hari.data = jadwal.hari
+    form.tanggal.data = jadwal.tanggal
+    form.minimal.data = jadwal.kadar_min
+    form.maximal.data = jadwal.kadar_max
+    form.jam_mulai.data = jadwal.jam_mulai
+    form.jam_selesai.data = jadwal.jam_selesai
+    form.kecamatan.data = jadwal.kecamatan_id
+    form.kelurahan.data = jadwal.kelurahan_id
+
+
+    return render_template('jadwal/edit-jadwal.html',
+                           title='Jadwal',
+                           subtitle = 'Jadwal Penyebaran / Edit Jadwal',
+                           days = days,
+                           kecamatan = kecamatan,
+                           form = form,
+                           jadwal = jadwal)
+
+@jadwal_bp.route('/jadwal/hapus/<int:id>', methods=['DELETE'])
+@login_required
+def delete_jadwal(id):
+    jadwal = Jadwal.query.get_or_404(id)
+    jadwal.user_id = current_user.id
+    jadwal.deleted_at = datetime.now(ZoneInfo("Asia/Jakarta"))
+
+    db.session.commit()
+    return jsonify({'message': 'Jadwal berhasil dihapus'})
 
 
 

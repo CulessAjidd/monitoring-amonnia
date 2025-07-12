@@ -139,6 +139,7 @@ def edit_masyarakat(id):
                            )
 
 @masyarakat_bp.route('/masyarakat/hapus/<int:id>', methods=['DELETE'])
+@login_required
 def delete_masyarakat(id):
     user = User.query.get_or_404(id)
     user.deleted_at = datetime.now(ZoneInfo("Asia/Jakarta"))

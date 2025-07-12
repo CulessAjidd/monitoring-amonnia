@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}{{title}}{% endblock %}
 
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -74,16 +74,22 @@
                     <td class="text-center">{{ jadwal.durasi }}</td>
                     <td class="text-center">{{ jadwal.kadar }}</td>
                     <td class="text-center"><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                    <td class="text-center"><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
+                    <td class="text-center">
+                        {%if jadwal.status == 'Terkirim'%}
+                        <span class="badge rounded-pill bg-label-success me-1">{{ jadwal.status }}</span>
+                        {%else%}
+                        <span class="badge rounded-pill bg-label-danger me-1">{{ jadwal.status }}</span>
+                        {%endif%}
+                    </td>
                     <td>
                         <div class="d-flex flex-row gap-4">
                             <a class="dropdown-item" href="javascript:void(0);"
                             ><i class="icon-base text-info ri ri-mail-send-line icon-25px me-1"></i></a
                             >
-                            <a class="dropdown-item" href="javascript:void(0);"
+                            <a class="dropdown-item" href="{{ url_for('jadwal.edit_jadwal', id=jadwal.id) }}"
                             ><i class="icon-base text-secondary ri ri-pencil-fill icon-25px me-1"></i></a
                             >
-                            <a class="dropdown-item" href="javascript:void(0);"
+                            <a class="dropdown-item btn-delete" data-id="{{jadwal.id}}" href="javascript:void(0);"
                             ><i class="icon-base text-danger ri ri-delete-bin-6-line icon-25px me-1"></i></a
                             >
                         </div>
@@ -93,7 +99,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="d-flex my-4 justify-content-end">
+        <div class="d-flex my-4 justify-content-end mx-4">
             <nav>
                 <ul class="pagination">
                     {% if pagination.has_prev %}
@@ -122,4 +128,28 @@
         </div>
     </div>
 </div>
+<script>
+    $('.btn-delete').click(function () {
+        const jadwalId = $(this).data('id');
+
+        if (confirm('Yakin ingin menghapus jadwal ini?')) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                url: '/jadwal/hapus/' + jadwalId,
+                type: 'DELETE',
+                success: function (res) {
+                    alert(res.message);
+                    location.reload();
+                },
+                error: function () {
+                    alert('Gagal menghapus jadwal.');
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

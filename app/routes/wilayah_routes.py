@@ -1,6 +1,7 @@
 import sys
 
 from flask import Blueprint, render_template, redirect, request, url_for, session, jsonify
+from flask_login import login_required
 
 from app.models.kabupaten import Kabupaten
 from app.models.kecamatan import Kecamatan
@@ -12,6 +13,7 @@ from app import db
 wilayah_bp = Blueprint('wilayah', __name__)
 
 @wilayah_bp.route('/wilayah/provinsi', methods=['GET'])
+@login_required
 def lihat_provinsi():
     # if 'user_id' not in session:
     #     return redirect(url_for('auth.login'))
@@ -56,6 +58,7 @@ def lihat_provinsi():
                            )
 
 @wilayah_bp.route('/ajax/kelurahan/<int:kecamatan_id>', methods=['GET'])
+@login_required
 def get_ajax_kelurahan(kecamatan_id):
     kelurahan = Kelurahan.query.filter_by(kecamatan_id=kecamatan_id).order_by(Kelurahan.name.asc()).all()
     result = [{"id": k.id, "name": k.name} for k in kelurahan]

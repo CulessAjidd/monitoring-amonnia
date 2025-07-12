@@ -61,7 +61,8 @@
     <!--? Config: Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file. -->
 
     <script src="{{url_for('static', filename='js/config.js')}}"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -73,7 +74,7 @@
         <aside id="layout-menu" class="layout-menu menu-vertical menu bg-white">
             <div class="app-brand demo" style="height: 130px;">
 
-<!--                <img src="{{url_for('static', filename='logo/logo.png')}}" class="bg-primary" width="170" alt="">-->
+                <!--                <img src="{{url_for('static', filename='logo/logo.png')}}" class="bg-primary" width="170" alt="">-->
                 <a href="index.html" class="app-brand-link mt-10">
                               <span class="app-brand-logo demo">
                                 <span class="text-primary">
@@ -179,10 +180,11 @@
                             <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);"
                                data-bs-toggle="dropdown">
                                 <div class="avatar avatar-online">
-                                    <img src="{{url_for('static', filename='img/avatars/1.png')}}" alt="avatar" class="rounded-circle"/>
+                                    <img src="{{url_for('static', filename='img/avatars/1.png')}}" alt="avatar"
+                                         class="rounded-circle"/>
                                 </div>
                             </a>
-                            <ul class="nav-item dropdown-menu dropdown-menu-end py-2" style="margin-top: 250px">
+                            <ul class="nav-item dropdown-menu dropdown-menu-end py-2" style="margin-top: 300px">
                                 <li>
                                     <a class="dropdown-item" href="pages-account-settings-account.html">
                                         <div class="d-flex align-items-center">
@@ -195,10 +197,15 @@
                                                 </div>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <h6 class="mb-0 small">John Doe</h6>
+                                                <h6 class="mb-0 small">{{ current_user.name }}</h6>
                                                 <small class="text-body-secondary">Admin</small>
                                             </div>
                                         </div>
+                                        <hr>
+                                        <div class="d-flex mt-4 text-center flex-column justify-content-center">
+                                                <small class="text-body-secondary">Kabupaten</small>
+                                             <h6 class="mb-0 small">{{ current_user.kabupaten.name }}</h6>
+                                         </div>
                                     </a>
                                 </li>
                                 <li>
