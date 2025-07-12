@@ -1,6 +1,6 @@
 import sys
 
-from flask import Blueprint, render_template, redirect, request, url_for, session
+from flask import Blueprint, render_template, redirect, request, url_for, session, jsonify
 
 from app.models.kabupaten import Kabupaten
 from app.models.kecamatan import Kecamatan
@@ -47,15 +47,6 @@ def lihat_provinsi():
 
     page_range = range(start_page, end_page + 1)
 
-    results = []
-    for kelurahan, kecamatan, kabupaten, provinsi in pagination.items:
-        results.append({
-            "kelurahan": kelurahan.name,
-            "kecamatan": kecamatan.name,
-            "kabupaten": kabupaten.name,
-            "provinsi": provinsi.name,
-        })
-
     return render_template('wilayah/lihat-wilayah.html',
                            title='Wilayah',
                            subtitle='Wilayah / Provinsi',
@@ -63,4 +54,11 @@ def lihat_provinsi():
                            search=search,
                            page_range=page_range
                            )
+
+@wilayah_bp.route('/ajax/kelurahan/<int:kecamatan_id>', methods=['GET'])
+def get_ajax_kelurahan(kecamatan_id):
+    kelurahan = Kelurahan.query.filter_by(kecamatan_id=kecamatan_id).order_by(Kelurahan.name.asc()).all()
+    result = [{"id": k.id, "name": k.name} for k in kelurahan]
+
+    return jsonify(kelurahan=result)
 

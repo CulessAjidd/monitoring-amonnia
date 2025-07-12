@@ -24,7 +24,8 @@ def create_app():
     from app.models.provinsi import Provinsi
     from app.models.kabupaten import Kabupaten
     from app.models.kecamatan import Kecamatan
-    # from app.models.kelurahan import Kelurahan
+    from app.models.kelurahan import Kelurahan
+    from app.models.jadwal import Jadwal
 
     db.init_app(app)
     migrate.init_app(app, db)

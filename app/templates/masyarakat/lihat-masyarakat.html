@@ -6,46 +6,112 @@
 <div class="container-xxl flex-grow-1 container-p-y">
 
     <div class="d-flex flex-row justify-content-between mb-2">
-            <div class="card p-2" style="width: fit-content;">
-                <div class="d-flex gap-2 justify-content-around">
-                    <button type="button" class="btn btn-sm btn-primary">Lihat Mayarakat</button>
-                    <button type="button" class="btn btn-sm btn-outline-primary">Tambah Masyarakat</button>
-                </div>
+        <div class="card p-2" style="width: fit-content;">
+            <div class="d-flex gap-2 justify-content-around">
+                <a href="{{url_for('masyarakat.lihat_masyarakat')}}" class="btn btn-sm btn-primary">Lihat Mayarakat</a>
+                <a href="{{url_for('masyarakat.tambah_masyarakat')}}" class="btn btn-sm btn-outline-primary">Tambah
+                    Masyarakat</a>
             </div>
-        <div>
-            <button type="button" class="btn btn-sm btn-primary">Simpan Masyarakat</button>
         </div>
     </div>
 
     <div class="card">
         <h5 class="card-header">Daftar Masyarakat</h5>
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-success alert-dismissible" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+            <div class="d-flex flex-column">
+                <div class="my-4">
+                    <form method="get">
+                        <div class="d-flex justify-content-between">
+                            <div class="d-flex flex-row gap-2 w-100">
+                                <input
+                                        type="text"
+                                        name="search"
+                                        placeholder="Pencarian ..."
+                                        value="{{ search }}"
+                                        class="form-control form-control-sm w-25"/>
+                                <button type="submit" class="btn btn-sm btn-light">Cari</button>
+                            </div>
+                            <a href="{{ url_for('masyarakat.lihat_masyarakat') }}"
+                               class="btn btn-sm btn-outline-light text-black w-20">Clear Pencarian</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="table-responsive text-nowrap">
             <table class="table">
                 <thead>
                 <tr>
                     <th>No</th>
-                    <th>Lokasi</th>
-                    <th>Waktu</th>
-                    <th>Durasi Penyebaran</th>
-                    <th>Kadar Amonnia</th>
-                    <th>Notifikasi</th>
-                    <th>Progress</th>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>Kecamatan</th>
+                    <th>Kelurahan</th>
+                    <th>Status</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
+                {% for user in pagination.items %}
                 <tr>
-                    <td>1</td>
+                    <td>{{ (pagination.page - 1) * pagination.per_page + loop.index }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.kecamatan.name }}</td>
+                    <td>{{ user.kelurahan.name }}</td>
+                    <td class="text-center"><span
+                            class="badge rounded-pill bg-label-success me-1">{{ user.status }}</span></td>
                     <td>
-                        <i class="icon-base ri ri-bank-fill icon-22px text-primary me-4"></i><span>Bank Project</span>
+                        <div class="d-flex flex-row gap-2">
+                            <a class="dropdown-item" href="javascript:void(0);"
+                            ><i class="icon-base text-secondary ri ri-pencil-fill icon-25px me-1"></i></a
+                            >
+                            <a class="dropdown-item" href="javascript:void(0);"
+                            ><i class="icon-base text-danger ri ri-delete-bin-6-line icon-25px me-1"></i></a
+                            >
+                        </div>
                     </td>
-                    <td>Jerry Milton</td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
                 </tr>
+                {% endfor %}
                 </tbody>
             </table>
+        </div>
+        <div class="d-flex m-4 justify-content-end">
+            <nav>
+                <ul class="pagination">
+                    {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="{{ url_for('masyarakat.lihat_masyarakat', page=pagination.prev_num, search=search) }}">«</a>
+                    </li>
+                    {% endif %}
+
+                    {% for p in page_range %}
+                    <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('masyarakat.lihat_masyarakat', page=p, search=search) }}">{{
+                            p
+                            }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="{{ url_for('masyarakat.lihat_masyarakat', page=pagination.next_num, search=search) }}">»</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
     </div>
 </div>

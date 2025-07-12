@@ -1,0 +1,144 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+
+    <div class="d-flex flex-row justify-content-between mb-2">
+        <div class="card p-2" style="width: fit-content;">
+            <div class="d-flex gap-2 justify-content-around">
+                <a href="{{url_for('masyarakat.lihat_masyarakat')}}" class="btn btn-sm btn-outline-primary">Lihat
+                    Mayarakat</a>
+                <a href="{{url_for('masyarakat.tambah_masyarakat')}}" class="btn btn-sm btn-primary">Tambah
+                    Masyarakat</a>
+            </div>
+        </div>
+        <div>
+            <button type="submit" form="tambah-masyarakat" class="btn btn-sm btn-primary">Simpan Masyarakat</button>
+        </div>
+    </div>
+    <form id="tambah-masyarakat" method="POST">
+        {{ form.csrf_token }}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="d-flex flex-column gap-4">
+                    <div class="card">
+                        <h5 class="card-header">Data Masyarakat</h5>
+                        <hr>
+
+                        <div class="d-flex flex-column px-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label class="form-label" for="collapsible-nama">Nama</label>
+                                        <input
+                                                type="text"
+                                                name="name"
+                                                id="collapsible-nama"
+                                                class="form-control form-control-sm w-full"/>
+                                        {% if form.name.errors %}
+                                        <div class="form-text text-danger">{{ form.name.errors[0] }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label class="form-label" for="select-kecamatan">Pilih Status</label>
+                                        <select name="status"
+                                                class="form-select form-select-sm">
+                                            <option value="">Pilih Status</option>
+                                            <option value="Aktif">Aktif</option>
+                                            <option value="Tidak Aktif">Tidak Aktif</option>
+                                        </select>
+                                        {% if form.status.errors %}
+                                        <div class="form-text text-danger">{{ form.status.errors[0] }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label" for="collapsible-email">Email Aktif</label>
+                                <input
+                                        type="email"
+                                        name="email"
+                                        id="collapsible-email"
+                                        class="form-control form-control-sm"/>
+                                {% if form.email.errors %}
+                                <div class="form-text text-danger">{{ form.email.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex flex-column gap-4">
+                    <div class="card">
+                        <h5 class="card-header">Lokasi</h5>
+                        <hr>
+                        <div class="d-flex flex-row gap-2 justify-content-around px-4">
+                            <div class="mb-4 w-50">
+                                <label class="form-label" for="select-kecamatan">Pilih Kecamatan</label>
+                                <select id="select-kecamatan" name="kecamatan" class="form-select form-select-sm">
+                                    <option value="">Pilih Kecamatan</option>
+                                    {%for kec in kecamatan%}
+                                    <option value="{{kec.id}}" {% if kec== form.kecamatan.data %}selected{% endif %}>
+                                        {{kec.name}}
+                                    </option>
+                                    {%endfor%}
+                                </select>
+                                {% if form.kecamatan.errors %}
+                                <div class="form-text text-danger">{{ form.kecamatan.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-4 w-50">
+                                <label class="form-label" for="select-kelurahan">Pilih Kelurahan</label>
+                                <select id="select-kelurahan" name="kelurahan" class="form-select form-select-sm">
+                                    <option value="">Pilih Kelurahan</option>
+                                </select>
+                                {% if form.kelurahan.errors %}
+                                <div class="form-text text-danger">{{ form.kelurahan.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $(document).ready(function () {
+        var selectedKelurahanId = "{{ request.form.get('kelurahan', '') }}";
+        $('#select-kecamatan').on('change', function () {
+            var kecamatanId = $(this).val();
+            $('#select-kelurahan').html('<option value="">Loading...</option>');
+            if (kecamatanId) {
+                $.ajax({
+                    url: '/ajax/kelurahan/' + kecamatanId,
+                    type: 'GET',
+                    success: function (data) {
+                        var options = '<option value="">Pilih Kelurahan</option>';
+                        $.each(data.kelurahan, function (i, kel) {
+                            var selected = (kel.id == selectedKelurahanId) ? 'selected' : '';
+                            options += '<option value="' + kel.id + '" ' + selected + '>' + kel.name + '</option>';
+                        });
+                        $('#select-kelurahan').html(options);
+                    },
+                    error: function () {
+                        $('#select-kelurahan').html('<option value="">Gagal memuat kabupaten</option>');
+                    }
+                });
+            } else {
+                $('#select-kelurahan').html('<option value="">Pilih Kabupaten</option>');
+            }
+        });
+        var selectedKecamatanId = "{{ request.form.get('kecamatan', '') }}";
+        if (selectedKecamatanId) {
+            $('#select-kecamatan').val(selectedKecamatanId).trigger('change');
+        }
+    });
+</script>
+{% endblock %}

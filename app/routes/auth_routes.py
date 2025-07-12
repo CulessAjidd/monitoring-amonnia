@@ -39,6 +39,10 @@ def logout():
 # optional: untuk membuat user admin
 @auth_bp.route('/create-admin')
 def create_admin():
+    is_empty = User.query.first() is None
+    if not is_empty:
+        return "User sudah ada"
+
     role = Role.query.filter_by(name='admin').first()
     if not role:
         role = Role(name='admin')

@@ -30,9 +30,12 @@
                                 <select id="select-day" name="hari" class="form-select form-select-sm">
                                     <option value="">Pilih Hari</option>
                                     {%for day in days%}
-                                    <option value="{{day}}">{{day}}</option>
+                                    <option value="{{day}}"  {% if day == form.hari.data %}selected{% endif %}>{{day}}</option>
                                     {%endfor%}
                                 </select>
+                                {% if form.hari.errors %}
+                                <div class="form-text text-danger">{{ form.hari.errors[0] }}</div>
+                                {% endif %}
                             </div>
 
                             <div class="mb-4 w-50">
@@ -41,7 +44,11 @@
                                         type="date"
                                         name="tanggal"
                                         id="collapsible-tanggal"
+                                        value="{{ form.tanggal.data}}"
                                         class="form-control form-control-sm"/>
+                                {% if form.tanggal.errors %}
+                                <div class="form-text text-danger">{{ form.tanggal.errors[0] }}</div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="d-flex flex-row gap-2 justify-content-around px-4">
@@ -50,17 +57,25 @@
                                 <input
                                         type="time"
                                         id="collapsible-jam-mulai"
-                                        name="jam-mulai"
+                                        name="jam_mulai"
+                                        value="{{ form.jam_mulai.data }}"
                                         class="form-control form-control-sm"/>
+                                {% if form.jam_mulai.errors %}
+                                <div class="form-text text-danger">{{ form.jam_mulai.errors[0] }}</div>
+                                {% endif %}
                             </div>
 
                             <div class="mb-4 w-50">
                                 <label class="form-label" for="collapsible-jam-selesai">Pilih Jam Selesai</label>
                                 <input
                                         type="time"
-                                        name="jam-selesai"
+                                        name="jam_selesai"
+                                        value="{{ form.jam_selesai.data }}"
                                         id="collapsible-jam-selesai"
                                         class="form-control form-control-sm"/>
+                                {% if form.jam_selesai.errors %}
+                                <div class="form-text text-danger">{{ form.jam_selesai.errors[0] }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -73,8 +88,13 @@
                                 <label class="form-label" for="collapsible-judul">Judul Notifikasi</label>
                                 <input
                                         type="text"
+                                        name="title"
                                         id="collapsible-judul"
+                                        value="{{ form.title.data or '' }}"
                                         class="form-control form-control-sm"/>
+                                {% if form.title.errors %}
+                                <div class="form-text text-danger">{{ form.title.errors[0] }}</div>
+                                {% endif %}
                             </div>
 
                             <div class="mb-4">
@@ -82,10 +102,14 @@
                                 <textarea
                                         id="textarea-desc"
                                         rows="5"
+                                        name="description"
                                         class="form-control"
                                         placeholder="Tulis deskripsi lengkapnya disini !"
                                         aria-label="Tulis deskripsi lengkapnya disini !"
-                                        aria-describedby="basic-icon-default-message2"></textarea>
+                                        aria-describedby="basic-icon-default-message2">{{ form.description.data or '' }}</textarea>
+                                {% if form.description.errors %}
+                                <div class="form-text text-danger">{{ form.description.errors[0] }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -99,24 +123,25 @@
                         <div class="d-flex flex-row gap-2 justify-content-around px-4">
                             <div class="mb-4 w-50">
                                 <label class="form-label" for="select-kecamatan">Pilih Kecamatan</label>
-                                <select id="select-kecamatan" class="form-select form-select-sm">
+                                <select id="select-kecamatan" name="kecamatan" class="form-select form-select-sm">
                                     <option value="">Pilih Kecamatan</option>
                                     {%for kec in kecamatan%}
-                                    <option value="{{kec.id}}">{{kec.name}}</option>
+                                    <option value="{{kec.id}}"  {% if kec == form.kecamatan.data %}selected{% endif %}>{{kec.name}}</option>
                                     {%endfor%}
                                 </select>
+                                {% if form.kecamatan.errors %}
+                                <div class="form-text text-danger">{{ form.kecamatan.errors[0] }}</div>
+                                {% endif %}
                             </div>
 
                             <div class="mb-4 w-50">
                                 <label class="form-label" for="select-kelurahan">Pilih Kelurahan</label>
-                                <select id="select-kelurahan" class="form-select form-select-sm">
-                                    <option>Rocky</option>
-                                    <option>Pulp Fiction</option>
-                                    <option>The Godfather</option>
-                                    <option>Breaking Bad</option>
-                                    <option>Black Mirror</option>
-                                    <option>Money Heist</option>
+                                <select id="select-kelurahan" name="kelurahan" class="form-select form-select-sm">
+                                    <option value="">Pilih Kelurahan</option>
                                 </select>
+                                {% if form.kelurahan.errors %}
+                                <div class="form-text text-danger">{{ form.kelurahan.errors[0] }}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -159,4 +184,36 @@
         </div>
     </form>
 </div>
+<script>
+    $(document).ready(function () {
+        var selectedKelurahanId = "{{ request.form.get('kelurahan', '') }}";
+        $('#select-kecamatan').on('change', function () {
+            var kecamatanId = $(this).val();
+            $('#select-kelurahan').html('<option value="">Loading...</option>');
+            if (kecamatanId) {
+                $.ajax({
+                    url: '/ajax/kelurahan/' + kecamatanId,
+                    type: 'GET',
+                    success: function (data) {
+                        var options = '<option value="">Pilih Kelurahan</option>';
+                        $.each(data.kelurahan, function (i, kel) {
+                            var selected = (kel.id == selectedKelurahanId) ? 'selected' : '';
+                            options += '<option value="' + kel.id + '" ' + selected + '>' + kel.name + '</option>';
+                        });
+                        $('#select-kelurahan').html(options);
+                    },
+                    error: function () {
+                        $('#select-kelurahan').html('<option value="">Gagal memuat kabupaten</option>');
+                    }
+                });
+            } else {
+                $('#select-kelurahan').html('<option value="">Pilih Kabupaten</option>');
+            }
+        });
+        var selectedKecamatanId = "{{ request.form.get('kecamatan', '') }}";
+        if (selectedKecamatanId) {
+            $('#select-kecamatan').val(selectedKecamatanId).trigger('change');
+        }
+    });
+</script>
 {% endblock %}
