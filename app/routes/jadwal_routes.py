@@ -9,9 +9,12 @@ from app.forms import JadwalForm
 from app.models.jadwal import Jadwal
 from app.models.kecamatan import Kecamatan
 from app.models.kelurahan import Kelurahan
+from app.models.role import Role
+from app.models.user import User
 from app.services.mail_service import send_email
 
 jadwal_bp = Blueprint('jadwal', __name__)
+
 
 @jadwal_bp.route('/jadwal')
 @login_required
@@ -21,10 +24,10 @@ def lihat_jadwal():
     per_page = request.args.get("per_page", 10, type=int)
 
     query = (db.session.query(Jadwal)
-         .join(Kecamatan, Jadwal.kecamatan_id == Kecamatan.id)
-         .join(Kelurahan, Jadwal.kelurahan_id == Kelurahan.id)
-        .filter(Jadwal.deleted_at == None)
-         .order_by(Jadwal.id.desc()))
+             .join(Kecamatan, Jadwal.kecamatan_id == Kecamatan.id)
+             .join(Kelurahan, Jadwal.kelurahan_id == Kelurahan.id)
+             .filter(Jadwal.deleted_at == None)
+             .order_by(Jadwal.id.desc()))
 
     if search:
         like = f"%{search}%"
@@ -80,7 +83,6 @@ def lihat_jadwal():
 @jadwal_bp.route('/jadwal/tambah', methods=['GET', 'POST'])
 @login_required
 def tambah_jadwal():
-
     form = JadwalForm()
 
     days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumad', 'Sabtu', 'Minggu']
@@ -106,25 +108,17 @@ def tambah_jadwal():
         flash('Jadwal berhasil ditambahkan', 'success')
         return redirect(url_for('jadwal.lihat_jadwal'))
 
-    # result = send_email(
-    #     subject="Selamat Datang di Aplikasi Kami",
-    #     recipients=["muhajidachmad@gmail.com"],
-    #     template_name="emails/info.html",
-    #     context={"username": "Ajid"},
-    #     bcc=["ajid.developer@gmail.com"]
-    # )
-
     return render_template('jadwal/tambah-jadwal.html',
                            title='Jadwal',
-                           subtitle = 'Jadwal Penyebaran / Tambah Jadwal',
-                           days = days,
-                           kecamatan = kecamatan,
-                           form = form)
+                           subtitle='Jadwal Penyebaran / Tambah Jadwal',
+                           days=days,
+                           kecamatan=kecamatan,
+                           form=form)
+
 
 @jadwal_bp.route('/jadwal/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_jadwal(id):
-
     jadwal = Jadwal.query.get_or_404(id)
     form = JadwalForm()
 
@@ -132,7 +126,6 @@ def edit_jadwal(id):
     kecamatan = Kecamatan.query.filter_by(kabupaten_id=current_user.kabupaten_id).order_by(Kecamatan.name.asc()).all()
 
     if form.validate_on_submit():
-
         jadwal.title = form.title.data
         jadwal.description = form.description.data
         jadwal.hari = form.hari.data
@@ -149,14 +142,6 @@ def edit_jadwal(id):
         flash('Jadwal berhasil diperbahrui', 'success')
         return redirect(url_for('jadwal.lihat_jadwal'))
 
-    # result = send_email(
-    #     subject="Selamat Datang di Aplikasi Kami",
-    #     recipients=["muhajidachmad@gmail.com"],
-    #     template_name="emails/info.html",
-    #     context={"username": "Ajid"},
-    #     bcc=["ajid.developer@gmail.com"]
-    # )
-
     form.title.data = jadwal.title
     form.description.data = jadwal.description
     form.hari.data = jadwal.hari
@@ -168,14 +153,14 @@ def edit_jadwal(id):
     form.kecamatan.data = jadwal.kecamatan_id
     form.kelurahan.data = jadwal.kelurahan_id
 
-
     return render_template('jadwal/edit-jadwal.html',
                            title='Jadwal',
-                           subtitle = 'Jadwal Penyebaran / Edit Jadwal',
-                           days = days,
-                           kecamatan = kecamatan,
-                           form = form,
-                           jadwal = jadwal)
+                           subtitle='Jadwal Penyebaran / Edit Jadwal',
+                           days=days,
+                           kecamatan=kecamatan,
+                           form=form,
+                           jadwal=jadwal)
+
 
 @jadwal_bp.route('/jadwal/hapus/<int:id>', methods=['DELETE'])
 @login_required
@@ -188,6 +173,53 @@ def delete_jadwal(id):
     return jsonify({'message': 'Jadwal berhasil dihapus'})
 
 
+@jadwal_bp.route('/jadwal/notifikasi/<int:id>', methods=['GET'])
+@login_required
+def send_jadwal(id):
+    try:
+        jadwal = Jadwal.query.get_or_404(id)
 
+        dt_mulai = datetime.combine(date.today(), jadwal.jam_mulai)
+        dt_selesai = datetime.combine(date.today(), jadwal.jam_selesai)
+        durasi = dt_selesai - dt_mulai
+        total_menit = durasi.total_seconds() // 60
+        jam = int(total_menit // 60)
+        menit = int(total_menit % 60)
 
+        ctx = {
+            "title": jadwal.title,
+            "tanggal": jadwal.tanggal.strftime('%d %B %Y'),
+            "jam_mulai": jadwal.jam_mulai.strftime('%H:%M'),
+            "durasi": f"{jam} jam {menit} menit",
+            "kadar": f"{jadwal.kadar_min}% - {jadwal.kadar_max}%",
+            "kecamatan": jadwal.kecamatan.name,
+            "kelurahan": jadwal.kelurahan.name
+        }
 
+        email_list = (
+            db.session.query(User.email)
+            .join(Role, User.role_id == Role.id)
+            .filter(
+                Role.name == 'masyarakat',
+                User.kelurahan_id == jadwal.kelurahan_id,
+                User.status == 'Aktif',
+                User.deleted_at == None
+            )
+            .with_entities(User.email)
+            .all()
+        )
+        bcc_emails = [email[0] for email in email_list]
+
+        send_email(
+            subject=jadwal.title + " - Tim Monitoring Amonnia",
+            recipients=["muhajidachmad@gmail.com"],
+            template_name="emails/info.html",
+            context=ctx,
+            bcc=bcc_emails,
+            jadwal_id=jadwal.id
+        )
+        flash('Notifikasi sedang dikirim', 'success')
+        return redirect(url_for('jadwal.lihat_jadwal'))
+    except Exception as e:
+        flash('Notifikasi gagal dikirim', 'danger')
+        return redirect(url_for('jadwal.lihat_jadwal'))

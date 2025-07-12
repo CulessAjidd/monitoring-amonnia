@@ -20,7 +20,7 @@
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
             {% for category, message in messages %}
-            <div class="alert alert-success alert-dismissible" role="alert">
+            <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible" role="alert">
                 {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -83,7 +83,7 @@
                     </td>
                     <td>
                         <div class="d-flex flex-row gap-4">
-                            <a class="dropdown-item" href="javascript:void(0);"
+                            <a class="dropdown-item" href="{{ url_for('jadwal.send_jadwal', id=jadwal.id) }}"
                             ><i class="icon-base text-info ri ri-mail-send-line icon-25px me-1"></i></a
                             >
                             <a class="dropdown-item" href="{{ url_for('jadwal.edit_jadwal', id=jadwal.id) }}"
