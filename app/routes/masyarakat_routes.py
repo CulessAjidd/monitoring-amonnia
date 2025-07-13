@@ -156,5 +156,5 @@ def generate_unique_kode_admin():
              .filter(
                 Role.name == 'masyarakat',
             ).order_by(User.kode_admin.desc()).first())
-        if not is_empty:
+        if is_empty:
             return code

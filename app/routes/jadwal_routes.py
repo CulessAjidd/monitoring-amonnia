@@ -196,9 +196,9 @@ def send_jadwal(id):
 
 
 def get_status(kadar):
-    if kadar < 19:
+    if kadar < 27:
         return "Aman"
-    elif 19 <= kadar < 21:
-        return "Awas"
+    elif 28 <= kadar < 31:
+        return "Waspada"
     else:
-        return "Berbahaya"
+        return "Bahaya"
