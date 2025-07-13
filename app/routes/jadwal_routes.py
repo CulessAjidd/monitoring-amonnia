@@ -159,7 +159,8 @@ def send_jadwal(id):
             "kadar": f"{jadwal.kadar_min}% - {jadwal.kadar_max}%",
             "kecamatan": jadwal.kecamatan.name,
             "kelurahan": jadwal.kelurahan.name,
-            "status_kadar": jadwal.status_kadar
+            "status_kadar": jadwal.status_kadar,
+            "description": jadwal.description
         }
 
         email_list = (
@@ -184,6 +185,9 @@ def send_jadwal(id):
             bcc=bcc_emails,
             jadwal_id=jadwal.id
         )
+
+        jadwal.status = "Sedang Dikirim"
+        db.session.commit()
         flash('Notifikasi sedang dikirim', 'success')
         return redirect(url_for('jadwal.lihat_jadwal'))
     except Exception as e:
