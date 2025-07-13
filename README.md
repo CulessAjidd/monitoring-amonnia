@@ -1,4 +1,4 @@
-# Monitoring Amonia Dashboard
+# Monitoring Amonnia
 
 Step - step panduan isntalasi aplikasi flask
 
