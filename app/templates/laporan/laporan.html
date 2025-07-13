@@ -5,35 +5,132 @@
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="card">
-        <h5 class="card-header">Data Penyebaran Amonnia</h5>
+        <h5 class="card-header">Jadwal Penyebaran Amonnia</h5>
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible"
+                 role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+            <div class="d-flex flex-column mx-4">
+                <div class="my-4">
+                    <div class="d-flex justify-content-between">
+                        <form method="get" class=" w-75">
+                            <div class="d-flex flex-row gap-2">
+                                <input
+                                        type="text"
+                                        name="search"
+                                        placeholder="Pencarian ..."
+                                        value="{{ search }}"
+                                        class="form-control form-control-sm w-25"/>
+                                <button type="submit" class="btn btn-sm btn-light">Cari</button>
+                            </div>
+                        </form>
+                        <div class="d-flex flex-row gap-2">
+                            <a href="{{ url_for('laporan.laporan') }}"
+                               class="btn btn-sm btn-outline-light text-black">Clear Pencarian</a>
+                            <a href="{{ url_for('laporan.export_jadwal_excel') }}?search={{ request.args.get('search', '') }}"
+                               class="btn btn-sm btn-facebook text-white">Export Excel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="table-responsive text-nowrap">
             <table class="table">
                 <thead>
                 <tr>
                     <th>No</th>
-                    <th>Lokasi</th>
-                    <th>Waktu</th>
+                    <th>Tanggal Penyebaran</th>
+                    <th>Kecamatan</th>
+                    <th>Kelurahan</th>
+                    <th>Waktu Mulai</th>
                     <th>Durasi Penyebaran</th>
                     <th>Kadar Amonnia</th>
-                    <th>Notifikasi</th>
-                    <th>Progress</th>
+                    <th>Status Kadar</th>
                 </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
+                {% for jadwal in results %}
                 <tr>
-                    <td>1</td>
-                    <td>
-                        <i class="icon-base ri ri-bank-fill icon-22px text-primary me-4"></i><span>Bank Project</span>
+                    <td class="text-center">{{ loop.index }}</td>
+                    <td>{{ jadwal.tanggal.strftime('%d %B %Y') }}</td>
+                    <td class="text-center">{{ jadwal.kecamatan }}</td>
+                    <td>{{ jadwal.kelurahan }}</td>
+                    <td class="text-center">{{ jadwal.jam_mulai.strftime('%H:%M') }}</td>
+                    <td class="text-center">{{ jadwal.durasi }}</td>
+                    <td class="text-center">{{ jadwal.kadar }}</td>
+                    <td class="text-center">
+                        {%if jadwal.status_kadar == 'Aman'%}
+                        <span class="badge rounded-pill bg-label-success me-1">{{jadwal.status_kadar}}</span>
+                        {%elif jadwal.status_kadar == 'Awas'%}
+                        <span class="badge rounded-pill bg-label-warning me-1">{{jadwal.status_kadar}}</span>
+                        {%else%}
+                        <span class="badge rounded-pill bg-label-danger me-1">{{jadwal.status_kadar}}</span>
+                        {%endif%}
                     </td>
-                    <td>Jerry Milton</td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
-                    <td><span class="badge rounded-pill bg-label-warning me-1">Pending</span></td>
                 </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>
+        <div class="d-flex my-4 justify-content-end mx-4">
+            <nav>
+                <ul class="pagination">
+                    {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="{{ url_for('jadwal.lihat_jadwal', page=pagination.prev_num, search=search) }}">«</a>
+                    </li>
+                    {% endif %}
+
+                    {% for p in page_range %}
+                    <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('jadwal.lihat_jadwal', page=p, search=search) }}">{{
+                            p
+                            }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="{{ url_for('jadwal.lihat_jadwal', page=pagination.next_num, search=search) }}">»</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
+<script>
+    $('.btn-delete').click(function () {
+        const jadwalId = $(this).data('id');
+
+        if (confirm('Yakin ingin menghapus jadwal ini?')) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                url: '/jadwal/hapus/' + jadwalId,
+                type: 'DELETE',
+                success: function (res) {
+                    alert(res.message);
+                    location.reload();
+                },
+                error: function () {
+                    alert('Gagal menghapus jadwal.');
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

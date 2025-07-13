@@ -101,16 +101,9 @@
 
             <hr>
             <ul class="menu-inner">
-
-                <li class="menu-item {{ 'active' if title == 'Dashboard' else '' }}">
-                    <a href="{{url_for('dashboard.dashboard')}}" class="menu-link">
-                        <i class="menu-icon icon-base ri ri-dashboard-2-line"></i>
-                        <div data-i18n="Dashboard">Dashboard</div>
-                    </a>
-                </li>
                 <li class="menu-item {{ 'active' if title == 'Laporan' else '' }}">
                     <a href="{{url_for('laporan.laporan')}}" class="menu-link">
-                        <i class="menu-icon icon-base ri ri-time-line"></i>
+                        <i class="menu-icon icon-base ri ri-dashboard-2-line"></i>
                         <div data-i18n="Laporan">Laporan</div>
                     </a>
                 </li>
@@ -128,7 +121,7 @@
                 </li>
                 <li class="menu-item {{ 'active' if title == 'Masyarakat' else '' }}">
                     <a href="{{url_for('masyarakat.lihat_masyarakat')}}" class="menu-link">
-                        <i class="menu-icon icon-base ri ri-time-line"></i>
+                        <i class="menu-icon icon-base ri ri-notification-2-line"></i>
                         <div data-i18n="Manajemen Masyarakat">Manajemen Masyarakat</div>
                     </a>
                 </li>

@@ -7,7 +7,6 @@ from .routes.jadwal_routes import jadwal_bp
 from .routes.wilayah_routes import wilayah_bp
 from .routes.admin_routes import admin_bp
 from .routes.masyarakat_routes import masyarakat_bp
-from .routes.dashboard_routes import dashboard_bp
 from .routes.laporan_routes import laporan_bp
 from .extensions import db, migrate, mail, csrf, login_manager
 import logging
@@ -41,7 +40,6 @@ def create_app():
     app.register_blueprint(wilayah_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(masyarakat_bp)
-    app.register_blueprint(dashboard_bp)
     app.register_blueprint(laporan_bp)
 
 

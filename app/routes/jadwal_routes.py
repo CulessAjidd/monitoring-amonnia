@@ -4,6 +4,8 @@ from flask import Blueprint, render_template, flash, redirect, request, url_for,
 from flask_login import login_required, current_user
 from datetime import datetime, date
 
+from sqlalchemy import extract
+
 from app import db
 from app.forms import JadwalForm
 from app.models.jadwal import Jadwal
@@ -19,65 +21,23 @@ jadwal_bp = Blueprint('jadwal', __name__)
 @jadwal_bp.route('/jadwal')
 @login_required
 def lihat_jadwal():
-    search = request.args.get("search", "", type=str)
-    page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 10, type=int)
+    now = datetime.now()
+    bulan = now.month
+    tahun = now.year
 
-    query = (db.session.query(Jadwal)
+    jadwals = (db.session.query(Jadwal)
              .join(Kecamatan, Jadwal.kecamatan_id == Kecamatan.id)
              .join(Kelurahan, Jadwal.kelurahan_id == Kelurahan.id)
-             .filter(Jadwal.deleted_at == None)
-             .order_by(Jadwal.id.desc()))
+             .filter(
+        Jadwal.deleted_at == None,
+        extract('month', Jadwal.tanggal) == bulan,
+        extract('year', Jadwal.tanggal) == tahun
+    ).order_by(Jadwal.id.desc()))
 
-    if search:
-        like = f"%{search}%"
-        query = query.filter(
-            Kelurahan.name.ilike(like) |
-            Kecamatan.name.ilike(like) |
-            Jadwal.tanggal.ilike(like) |
-            Jadwal.status.ilike(like)
-        )
-
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
-
-    # routes.py (sebelum return render_template)
-    current_page = pagination.page
-    total_pages = pagination.pages
-
-    # tampilkan range 5 halaman di sekitar current
-    start_page = max(1, current_page - 2)
-    end_page = min(total_pages, current_page + 2)
-
-    page_range = range(start_page, end_page + 1)
-
-    results = []
-    for jadwal in pagination.items:
-        dt_mulai = datetime.combine(date.today(), jadwal.jam_mulai)
-        dt_selesai = datetime.combine(date.today(), jadwal.jam_selesai)
-        durasi = dt_selesai - dt_mulai
-        total_menit = durasi.total_seconds() // 60
-        jam = int(total_menit // 60)
-        menit = int(total_menit % 60)
-        results.append({
-            "id": jadwal.id,
-            "tanggal": jadwal.tanggal,
-            "kecamatan": jadwal.kecamatan.name,
-            "kelurahan": jadwal.kelurahan.name,
-            "jam_mulai": jadwal.jam_mulai,
-            "durasi": f"{jam} jam {menit} menit",
-            "kadar": f"{jadwal.kadar_min}% - {jadwal.kadar_max}%",
-            "kadar_min": jadwal.kadar_min,
-            "kadar_max": jadwal.kadar_max,
-            "status": jadwal.status,
-            "status_kadar": jadwal.status_kadar,
-        })
     return render_template('jadwal/lihat-jadwal.html',
                            title='Jadwal',
                            subtitle='Jadwal Penyebaran / Lihat Jadwal',
-                           pagination=pagination,
-                           search=search,
-                           page_range=page_range,
-                           results=results
+                           jadwals=jadwals
                            )
 
 
