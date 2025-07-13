@@ -179,7 +179,7 @@ def send_jadwal(id):
 
         send_email(
             subject=jadwal.title + " - Tim Monitoring Amonnia",
-            recipients=["muhajidachmad@gmail.com"],
+            recipients=["ajid.developer@gmail.com"],
             template_name="emails/info.html",
             context=ctx,
             bcc=bcc_emails,
